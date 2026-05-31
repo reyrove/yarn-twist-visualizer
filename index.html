@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yarn Twist Visualizer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🧶 Yarn Twist Visualizer</h1>
+
+    <div class="controls">
+      <label>TPI: <span id="tpiVal">10</span></label>
+      <input type="range" id="tpi" min="1" max="30" value="10" />
+
+      <label>Yarn Count (Ne): <span id="countVal">20</span></label>
+      <input type="range" id="yarnCount" min="1" max="40" value="20" />
+
+      <label>Twist Direction:</label>
+      <select id="twistType">
+        <option value="S">S-Twist</option>
+        <option value="Z">Z-Twist</option>
+      </select>
+
+      <label>Yarn Color:</label>
+      <input type="color" id="yarnColor" value="#4a90e2" />
+
+      <button onclick="exportPNG()">Export to PNG</button>
+    </div>
+
+    <div id="svgWrapper" class="zoom-wrapper">
+      <svg id="yarnSVG" width="300" height="300" viewBox="0 0 300 300">
+        <!-- Yarn path will be added here dynamically -->
+      </svg>
+    </div>
+
+    <p id="twistInfo"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
