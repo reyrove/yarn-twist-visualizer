@@ -1,0 +1,84 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    margin: 0;
+    background-color: rgb(176, 217, 204);
+  }
+  
+  .container {
+    background: rgb(227, 255, 167);
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+  
+  h1 {
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+  }
+  
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .controls input,
+  .controls select,
+  .controls label {
+    font-size: 1rem;
+  }
+  
+  button {
+    width: 100%;
+    padding: 0.6rem;
+    background: #983b9f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background 0.3s;
+  }
+  
+  button:hover {
+    background: #357ABD;
+  }
+  
+  .zoom-wrapper {
+    border: 1px solid #ddd;
+    overflow: hidden;
+    cursor: grab;
+    width: 300px;
+    height: 300px;
+    margin: auto;
+    touch-action: none;
+  }
+  
+  .zoom-wrapper:active {
+    cursor: grabbing;
+  }
+  
+  .visualizer {
+    margin-top: 2rem;
+    animation: rotate 4s linear infinite;
+    transform-origin: center;
+  }
+  
+  @keyframes rotate {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  #twistInfo {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: #333;
+  }

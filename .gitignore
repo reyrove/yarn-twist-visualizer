@@ -1,0 +1,70 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+*.bak
+*.backup
+*.old
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+
+# Export images (optional - remove to track exports)
+exports/
+*.png
+screenshot-*.png
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backup folders
+backup/
+backups/
+old/
+archive/
+
+# Make sure to keep source files
+!*.html
+!*.css
+!*.js
+!*.md
+!*.json
