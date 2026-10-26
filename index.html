@@ -3,41 +3,221 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Yarn Twist Visualizer</title>
+  <title>Yarn Twist Visualizer — Reyrove</title>
+  <meta name="description" content="A parameterized geometric model of yarn twist — TPI, yarn count (Ne), and twist direction drive the rendered fiber structure. True helix and zigzag modes, twist-angle computation, parameter export, and comparison against photographed yarn." />
+  <meta name="author" content="Reyhaneh Daneshdoost" />
   <link rel="icon" type="image/svg+xml" href="fav.svg">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>🧶 Yarn Twist Visualizer</h1>
+  <main class="container">
 
-    <div class="controls">
-      <label>TPI: <span id="tpiVal">10</span></label>
-      <input type="range" id="tpi" min="1" max="30" value="10" />
+    <header class="page-head">
+      <p class="eyebrow">REYROVE · RESEARCH &amp; SYSTEMS</p>
+      <h1>Yarn Twist Visualizer</h1>
+      <p class="lede">
+        A parameterized geometric model of yarn twist. TPI, yarn count
+        (Ne), and twist direction drive the rendered fiber structure in
+        real time. Twist angle and helix pitch are computed from the
+        inputs. Two rendering modes — zigzag approximation and true
+        helix — can be compared side by side, and either can be placed
+        beside a photograph of real yarn at the same parameters.
+      </p>
+    </header>
 
-      <label>Yarn Count (Ne): <span id="countVal">20</span></label>
-      <input type="range" id="yarnCount" min="1" max="40" value="20" />
+    <div class="layout">
 
-      <label>Twist Direction:</label>
-      <select id="twistType">
-        <option value="S">S-Twist</option>
-        <option value="Z">Z-Twist</option>
-      </select>
+      <!-- ===== LEFT: CONTROLS ===== -->
+      <section class="panel controls" aria-labelledby="controls-heading">
+        <h2 id="controls-heading">Parameters</h2>
 
-      <label>Yarn Color:</label>
-      <input type="color" id="yarnColor" value="#4a90e2" />
+        <div class="field">
+          <label for="tpi">
+            TPI <span class="val" id="tpiVal">10</span>
+          </label>
+          <input type="range" id="tpi" min="1" max="30" value="10" />
+        </div>
 
-      <button onclick="exportPNG()">Export to PNG</button>
+        <div class="field">
+          <label for="yarnCount">
+            Yarn count (Ne) <span class="val" id="countVal">20</span>
+          </label>
+          <input type="range" id="yarnCount" min="1" max="40" value="20" />
+        </div>
+
+        <div class="field">
+          <label for="twistType">Twist direction</label>
+          <select id="twistType">
+            <option value="S">S-Twist</option>
+            <option value="Z">Z-Twist</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="yarnColor">Yarn color</label>
+          <input type="color" id="yarnColor" value="#d4b483" />
+        </div>
+
+        <div class="field">
+          <label for="renderMode">Rendering mode</label>
+          <select id="renderMode">
+            <option value="zigzag">Zigzag approximation</option>
+            <option value="helix">True helix</option>
+          </select>
+        </div>
+
+        <div class="field checkbox">
+          <label>
+            <input type="checkbox" id="physicalRadius" checked />
+            Physically-grounded radius (k / √count)
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button type="button" id="exportPng">Export PNG</button>
+          <button type="button" id="exportJson">Export JSON</button>
+        </div>
+      </section>
+
+      <!-- ===== RIGHT: VISUAL + READOUTS ===== -->
+      <section class="panel visual-panel" aria-labelledby="visual-heading">
+        <h2 id="visual-heading" class="visually-hidden">Visualization</h2>
+
+        <div class="compare">
+          <figure class="view">
+            <div id="svgWrapper" class="zoom-wrapper">
+              <svg id="yarnSVG" width="400" height="400" viewBox="0 0 400 400"
+                   role="img" aria-labelledby="svg-title">
+                <title id="svg-title">Yarn twist model rendering</title>
+              </svg>
+            </div>
+            <figcaption>Model · <span id="modeLabel">zigzag</span></figcaption>
+          </figure>
+
+          <figure class="view">
+            <div class="photo-wrapper">
+              <img id="refPhoto" alt="" hidden />
+              <div id="photoPlaceholder" class="photo-placeholder">
+                <p>Upload a photograph of real yarn<br>at the same Ne and TPI.</p>
+                <label class="file-btn">
+                  Choose image
+                  <input type="file" id="photoInput" accept="image/*" hidden />
+                </label>
+              </div>
+            </div>
+            <figcaption>Reference · photograph</figcaption>
+          </figure>
+        </div>
+
+        <p id="twistInfo" class="readout"></p>
+
+        <dl class="derived" aria-label="Derived quantities">
+          <div><dt>Radius</dt><dd id="dRadius">–</dd></div>
+          <div><dt>Twist angle</dt><dd id="dAngle">–</dd></div>
+          <div><dt>Helix pitch</dt><dd id="dPitch">–</dd></div>
+          <div><dt>Turns</dt><dd id="dTurns">–</dd></div>
+        </dl>
+
+        <p id="divergenceNote" class="divergence"></p>
+      </section>
+
     </div>
 
-    <div id="svgWrapper" class="zoom-wrapper">
-      <svg id="yarnSVG" width="300" height="300" viewBox="0 0 300 300">
-        <!-- Yarn path will be added here dynamically -->
-      </svg>
-    </div>
+    <!-- ===== MODEL & ASSUMPTIONS ===== -->
+    <details class="model-panel">
+      <summary><strong>Model &amp; assumptions</strong></summary>
+      <div class="model-body">
+        <p>
+          This visualizer is a <em>parametric model</em>, not a
+          physical simulator. It encodes three textile parameters and
+          renders the resulting fiber structure. The goal is to make
+          the relationship between twist parameters and visible yarn
+          structure explorable, and to allow the model to be compared
+          directly against photographed yarn.
+        </p>
 
-    <p id="twistInfo"></p>
-  </div>
+        <h3>What is modeled</h3>
+        <ul>
+          <li>
+            <strong>Yarn count (Ne)</strong> is a linear density.
+            Diameter scales approximately with the inverse square
+            root of linear density, so the default radius is
+            <code>radius = k / √count</code>. A toggle switches to
+            the simpler linear form <code>radius = k / count</code>
+            for visual comparison — the linear form is <em>not</em>
+            physically motivated and is kept only as a reference.
+          </li>
+          <li>
+            <strong>TPI</strong> (twists per inch) sets the number
+            of visible turns along the rendered yarn length, capped
+            at 20 turns for legibility.
+          </li>
+          <li>
+            <strong>Twist direction</strong> (S or Z) flips the
+            handedness of the rendering: in zigzag mode, the lateral
+            offset of alternate segments; in helix mode, the
+            handedness of the helix itself.
+          </li>
+        </ul>
+
+        <h3>Two rendering modes</h3>
+        <ul>
+          <li>
+            <strong>Zigzag approximation</strong> — the original
+            renderer. Alternate segments are offset left and right,
+            producing a zigzag. It reads as twist at a glance but
+            does not follow the computed twist angle.
+          </li>
+          <li>
+            <strong>True helix</strong> — a genuine helical path
+            whose amplitude and pitch are driven by the computed
+            twist angle. This mode follows the model's own
+            mathematics; it is the mode to compare against
+            photographed yarn.
+          </li>
+        </ul>
+
+        <h3>Twist angle</h3>
+        <p>
+          For a helix, <code>tan θ = π · d · TPI</code>, where
+          <code>d</code> is yarn diameter. In model units we treat
+          <code>d = 2 · radius</code>. The computed angle is shown
+          in the derived quantities.
+        </p>
+
+        <h3>Known limitations</h3>
+        <ul>
+          <li>
+            The value of <code>k</code> in the radius formula is a
+            display constant, not a measured physical quantity.
+          </li>
+          <li>
+            Fiber count is fixed at 5. Real yarns have far more
+            fibers; the relationship between fiber count and visible
+            texture is not modeled.
+          </li>
+          <li>
+            The model renders a single yarn segment in isolation.
+            It does not model fabric, crimp, or inter-yarn
+            interaction.
+          </li>
+        </ul>
+
+        <h3>How to compare against reality</h3>
+        <ol>
+          <li>Photograph real yarn of known Ne and TPI against a neutral background, with a scale reference.</li>
+          <li>Set the model to the same Ne and TPI, and switch to <strong>true helix</strong> mode.</li>
+          <li>Upload the photograph using the reference panel.</li>
+          <li>Note where the model's silhouette diverges — twist angle, fiber count, packing density.</li>
+        </ol>
+      </div>
+    </details>
+
+    <p class="back-link">
+      <a href="https://reyrove.github.io/">← back to reyrove</a>
+    </p>
+
+  </main>
 
   <script src="script.js"></script>
 </body>
